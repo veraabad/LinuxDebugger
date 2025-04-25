@@ -3,6 +3,9 @@ project (MiniDbg)
 
 add_compile_options(-std=c++14)
 
+# Generate compile_commands.json
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 include_directories(deps/libelfin deps/linenoise include)
 add_executable(minidbg src/minidbg.cpp deps/linenoise/linenoise.c)
 
