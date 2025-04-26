@@ -1,5 +1,4 @@
-#ifndef MINIDBG_DEBUGGER_HPP
-#define MINIDBG_DEBUGGER_HPP
+#pragma once
 
 #include <utility>
 #include <string>
@@ -21,5 +20,3 @@ namespace minidbg {
         pid_t m_pid;
     };
 }
-
-#endif
