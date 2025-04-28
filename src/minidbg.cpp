@@ -1,6 +1,7 @@
 #include <vector>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
+#include <sys/personality.h>
 #include <unistd.h>
 #include <sstream>
 #include <iostream>
@@ -34,8 +35,10 @@ void debugger::handle_command(const std::string& line) {
 
     if (is_prefix(command, "cont")) {
         continue_execution();
-    }
-    else {
+    } else if (is_prefix(command, "break")) {
+        std::string addr{args[1], 2}; 
+        set_breakpoint_at_address(std::stol(addr, 0, 16));
+    } else {
         std::cerr << "Unknown command\n";
     }
 }
@@ -69,6 +72,14 @@ void execute_debugee (const std::string& prog_name) {
     execl(prog_name.c_str(), prog_name.c_str(), nullptr);
 }
 
+void debugger::set_breakpoint_at_address(std::intptr_t addr)
+{
+    std::cout << "Set breakpoint at address 0x" << std::hex << addr << std::endl;
+    breakpoint bp{m_pid, addr};
+    bp.enable();
+    m_breakpoints[addr] = bp;
+}
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Program name not specified";
@@ -80,6 +91,7 @@ int main(int argc, char* argv[]) {
     auto pid = fork();
     if (pid == 0) {
         //child
+        personality(ADDR_NO_RANDOMIZE);
         execute_debugee(prog);
 
     }
